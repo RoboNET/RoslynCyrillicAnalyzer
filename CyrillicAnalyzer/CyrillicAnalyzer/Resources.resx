@@ -141,6 +141,12 @@
   <data name="Property" xml:space="preserve">
     <value>Property</value>
   </data>
+  <data name="RemoveSymbols" xml:space="preserve">
+    <value>Remove non-ASCII symbols</value>
+  </data>
+  <data name="ReplaceSymbols" xml:space="preserve">
+    <value>Replace non-ASCII symbols to analog</value>
+  </data>
   <data name="Type" xml:space="preserve">
     <value>Type</value>
   </data>

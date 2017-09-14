@@ -125,6 +125,24 @@ namespace CyrillicAnalyzer {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Remove non-ASCII symbols.
+        /// </summary>
+        internal static string RemoveSymbols {
+            get {
+                return ResourceManager.GetString("RemoveSymbols", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Replace non-ASCII symbols to analog.
+        /// </summary>
+        internal static string ReplaceSymbols {
+            get {
+                return ResourceManager.GetString("ReplaceSymbols", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Type.
         /// </summary>
         internal static string Type {

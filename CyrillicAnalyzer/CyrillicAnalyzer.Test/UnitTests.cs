@@ -13,7 +13,7 @@ namespace CyrillicAnalyzer.Test
 
         //No diagnostics expected to show up
         [TestMethod]
-        public void TestMethod1()
+        public void TestEmpty()
         {
             var test = @"";
 
@@ -65,7 +65,7 @@ namespace CyrillicAnalyzer.Test
         {   
         }
     }";
-            VerifyCSharpFix(test, fixtest);
+            VerifyCSharpFix(test, fixtest, 0);
         }
 
         [TestMethod]
@@ -118,7 +118,7 @@ namespace CyrillicAnalyzer.Test
             }
         }
     }";
-            VerifyCSharpFix(test, fixtest);
+            VerifyCSharpFix(test, fixtest, 0);
         }
 
         [TestMethod]
@@ -132,7 +132,7 @@ namespace CyrillicAnalyzer.Test
     using System.Threading.Tasks;
     using System.Diagnostics;
 
-    namespace ConsoleApplication1Ж
+    namespace ConsoleApplication1С
     {
         class TypeName
         {   
@@ -141,7 +141,7 @@ namespace CyrillicAnalyzer.Test
             var expected = new DiagnosticResult
             {
                 Id = "CyrillicAnalyzer",
-                Message = String.Format("Namespace name of '{0}' contains non-ASCII letters (symbol '{1}' at index {2})", "ConsoleApplication1Ж", "Ж", 19),
+                Message = String.Format("Namespace name of '{0}' contains non-ASCII letters (symbol '{1}' at index {2})", "ConsoleApplication1С", "С", 19),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -165,7 +165,23 @@ namespace CyrillicAnalyzer.Test
         {   
         }
     }";
-            VerifyCSharpFix(test, fixtest);
+            VerifyCSharpFix(test, fixtest, 0);
+
+            var fixtest1 = @"
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using System.Diagnostics;
+
+    namespace ConsoleApplication1C
+    {
+        class TypeName
+        {   
+        }
+    }";
+            VerifyCSharpFix(test, fixtest1, 1);
         }
 
         [TestMethod]
@@ -214,7 +230,7 @@ namespace CyrillicAnalyzer.Test
             int i = 0;
         }
     }";
-            VerifyCSharpFix(test, fixtest);
+            VerifyCSharpFix(test, fixtest, 0);
         }
 
         [TestMethod]
@@ -263,7 +279,7 @@ namespace CyrillicAnalyzer.Test
             int i {get; set;}
         }
     }";
-            VerifyCSharpFix(test, fixtest);
+            VerifyCSharpFix(test, fixtest, 0);
         }
 
         [TestMethod]
@@ -318,7 +334,7 @@ namespace CyrillicAnalyzer.Test
             }
         }
     }";
-            VerifyCSharpFix(test, fixtest);
+            VerifyCSharpFix(test, fixtest, 0);
         }
 
         protected override CodeFixProvider GetCSharpCodeFixProvider()
