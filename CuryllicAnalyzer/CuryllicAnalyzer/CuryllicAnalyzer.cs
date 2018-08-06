@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using CuryllicAnalyzer;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -10,7 +14,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace CyrillicAnalyzer
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class CyrillicAnalyzerAnalyzer : DiagnosticAnalyzer
+    public class CyrillicAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "CyrillicAnalyzer";
 
@@ -26,7 +30,7 @@ namespace CyrillicAnalyzer
         private static readonly LocalizableString Property = new LocalizableResourceString(nameof(Resources.Property), Resources.ResourceManager, typeof(Resources));
 
         private const string Category = "Naming";
-
+        private Regex regex = new Regex(@"\b(?=[à-ÿÀ-ß¸¨]*[a-zA-Z])(?=[a-zA-Z]*[à-ÿÀ-ß¸¨])[\wà-ÿÀ-ß¸¨]+\b");
         private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
@@ -37,8 +41,41 @@ namespace CyrillicAnalyzer
             // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
             context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.NamedType, SymbolKind.Method, SymbolKind.Field, SymbolKind.Property, SymbolKind.Namespace);
             context.RegisterSyntaxTreeAction(AnalyzeFileNames);
-
             context.RegisterSyntaxNodeAction(AnalyzeLocals, SyntaxKind.VariableDeclarator);
+            context.RegisterCompilationAction(AnalyzeOtherFiles);
+        }
+
+        private void AnalyzeOtherFiles(CompilationAnalysisContext compilationAnalysisContext)
+        {
+            // Find the file with the invalid terms.
+            var additionalFiles = compilationAnalysisContext.Options.AdditionalFiles;
+
+            foreach (var additionalFile in additionalFiles)
+            {
+                var stringBuilder = new StringBuilder();
+                SourceText fileText = additionalFile.GetText(compilationAnalysisContext.CancellationToken);
+
+                foreach (var line in fileText.Lines)
+                {
+                    var lineText = line.ToString();
+                    var match = regex.Match(lineText);
+
+                    while (match.Success)
+                    {
+                        var matchStart = match.Index;
+                        var matchEnd = matchStart + match.Length;
+
+                        var symbol = lineText[match.Index];
+
+                        compilationAnalysisContext.ReportDiagnostic(
+                            Diagnostic.Create(Rule,
+                            Location.Create(additionalFile.Path, TextSpan.FromBounds(matchStart, matchEnd), new LinePositionSpan(LinePosition.Zero, LinePosition.Zero)),
+                                additionalFile.Path, symbol, match.Index, "File"));
+
+                        match = match.NextMatch();
+                    }
+                }
+            }
         }
 
         private void AnalyzeFileNames(SyntaxTreeAnalysisContext syntaxTreeContext)

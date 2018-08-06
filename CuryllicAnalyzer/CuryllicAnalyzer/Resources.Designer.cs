@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CyrillicAnalyzer {
+namespace CuryllicAnalyzer {
     using System;
     using System.Reflection;
     

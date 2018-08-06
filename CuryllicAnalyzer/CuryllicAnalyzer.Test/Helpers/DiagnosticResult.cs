@@ -1,7 +1,7 @@
-﻿using System;
 using Microsoft.CodeAnalysis;
+using System;
 
-namespace CyrillicAnalyzer.Test.Helpers
+namespace TestHelper
 {
     /// <summary>
     /// Location where the diagnostic appears, as determined by path, line number, and column number.
@@ -20,9 +20,9 @@ namespace CyrillicAnalyzer.Test.Helpers
                 throw new ArgumentOutOfRangeException(nameof(column), "column must be >= -1");
             }
 
-            Path = path;
-            Line = line;
-            Column = column;
+            this.Path = path;
+            this.Line = line;
+            this.Column = column;
         }
 
         public string Path { get; }
@@ -35,13 +35,23 @@ namespace CyrillicAnalyzer.Test.Helpers
     /// </summary>
     public struct DiagnosticResult
     {
-        private DiagnosticResultLocation[] _locations;
+        private DiagnosticResultLocation[] locations;
 
         public DiagnosticResultLocation[] Locations
         {
-            get => _locations ?? (_locations = new DiagnosticResultLocation[] { });
+            get
+            {
+                if (this.locations == null)
+                {
+                    this.locations = new DiagnosticResultLocation[] { };
+                }
+                return this.locations;
+            }
 
-            set => _locations = value;
+            set
+            {
+                this.locations = value;
+            }
         }
 
         public DiagnosticSeverity Severity { get; set; }
@@ -50,10 +60,28 @@ namespace CyrillicAnalyzer.Test.Helpers
 
         public string Message { get; set; }
 
-        public string Path => Locations.Length > 0 ? Locations[0].Path : "";
+        public string Path
+        {
+            get
+            {
+                return this.Locations.Length > 0 ? this.Locations[0].Path : "";
+            }
+        }
 
-        public int Line => Locations.Length > 0 ? Locations[0].Line : -1;
+        public int Line
+        {
+            get
+            {
+                return this.Locations.Length > 0 ? this.Locations[0].Line : -1;
+            }
+        }
 
-        public int Column => Locations.Length > 0 ? Locations[0].Column : -1;
+        public int Column
+        {
+            get
+            {
+                return this.Locations.Length > 0 ? this.Locations[0].Column : -1;
+            }
+        }
     }
 }

@@ -1,11 +1,11 @@
-Ôªøusing System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
 using System.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using CuryllicAnalyzer;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -21,7 +21,7 @@ namespace CyrillicAnalyzer
         private LocalizableString RemoveSymbols = new LocalizableResourceString(nameof(Resources.RemoveSymbols), Resources.ResourceManager, typeof(Resources));
         private LocalizableString ReplaceSymbols = new LocalizableResourceString(nameof(Resources.ReplaceSymbols), Resources.ResourceManager, typeof(Resources));
 
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(CyrillicAnalyzerAnalyzer.DiagnosticId);
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(CyrillicAnalyzer.DiagnosticId);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
@@ -151,26 +151,26 @@ namespace CyrillicAnalyzer
 
         private Dictionary<char, char> _charMap = new Dictionary<char, char>()
         {
-            {'—Å','c' },
-            {'–°','C' },
-            {'–∞','a' },
-            {'–ê','A' },
-            {'–æ','o' },
-            {'–û','O' },
-            {'–ù','H' },
-            {'—Ä','p' },
-            {'–†','P' },
-            {'–ú','M' },
-            {'–∫','k' },
-            {'–ö','K' },
-            {'—Ö','x' },
-            {'–•','X' },
-            {'–¢','T' },
-            {'—å','b' },
+            {'Ò','c' },
+            {'—','C' },
+            {'‡','a' },
+            {'¿','A' },
+            {'Ó','o' },
+            {'Œ','O' },
+            {'Õ','H' },
+            {'','p' },
+            {'–','P' },
+            {'Ã','M' },
+            {'Í','k' },
+            {' ','K' },
+            {'ı','x' },
+            {'’','X' },
+            {'“','T' },
+            {'¸','b' },
             {'e','e' },
-            {'–ï','E' },
-            {'–í','B' },
-            {'–≥','r' }
+            {'≈','E' },
+            {'¬','B' },
+            {'„','r' }
         };
     }
 }

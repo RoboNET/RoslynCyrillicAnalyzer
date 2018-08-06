@@ -1,16 +1,17 @@
-Ôªøusing System;
-using CyrillicAnalyzer.Test.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using TestHelper;
+using CuryllicAnalyzer;
+using CyrillicAnalyzer;
 
-namespace CyrillicAnalyzer.Test
+namespace CuryllicAnalyzer.Test
 {
     [TestClass]
-    public class UnitTest : Verifiers.CodeFixVerifier
+    public class UnitTest : CodeFixVerifier
     {
-
         //No diagnostics expected to show up
         [TestMethod]
         public void TestEmpty()
@@ -34,14 +35,14 @@ namespace CyrillicAnalyzer.Test
 
     namespace ConsoleApplication1
     {
-        class TypeName–ñ
+        class TypeName∆
         {   
         }
     }";
             var expected = new DiagnosticResult
             {
                 Id = "CyrillicAnalyzer",
-                Message = String.Format("Type name of '{0}' contains non-ASCII letters (symbol '{1}' at index {2})", "TypeName–ñ", "–ñ", 8),
+                Message = String.Format("Type name of '{0}' contains non-ASCII letters (symbol '{1}' at index {2})", "TypeName∆", "∆", 8),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -83,7 +84,7 @@ namespace CyrillicAnalyzer.Test
     {
         class TypeName
         {   
-            void TestMethod–ñ()
+            void TestMethod∆()
             {
             }
         }
@@ -91,7 +92,7 @@ namespace CyrillicAnalyzer.Test
             var expected = new DiagnosticResult
             {
                 Id = "CyrillicAnalyzer",
-                Message = String.Format("Method name of '{0}' contains non-ASCII letters (symbol '{1}' at index {2})", "TestMethod–ñ", "–ñ", 10),
+                Message = String.Format("Method name of '{0}' contains non-ASCII letters (symbol '{1}' at index {2})", "TestMethod∆", "∆", 10),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -132,7 +133,7 @@ namespace CyrillicAnalyzer.Test
     using System.Threading.Tasks;
     using System.Diagnostics;
 
-    namespace ConsoleApplication1–°
+    namespace ConsoleApplication1—
     {
         class TypeName
         {   
@@ -141,7 +142,7 @@ namespace CyrillicAnalyzer.Test
             var expected = new DiagnosticResult
             {
                 Id = "CyrillicAnalyzer",
-                Message = String.Format("Namespace name of '{0}' contains non-ASCII letters (symbol '{1}' at index {2})", "ConsoleApplication1–°", "–°", 19),
+                Message = String.Format("Namespace name of '{0}' contains non-ASCII letters (symbol '{1}' at index {2})", "ConsoleApplication1—", "—", 19),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -199,13 +200,13 @@ namespace CyrillicAnalyzer.Test
     {
         class TypeName
         {   
-            int i–∂ = 0;
+            int iÊ = 0;
         }
     }";
             var expected = new DiagnosticResult
             {
                 Id = "CyrillicAnalyzer",
-                Message = String.Format("Field name of '{0}' contains non-ASCII letters (symbol '{1}' at index {2})", "i–∂", "–∂", 1),
+                Message = String.Format("Field name of '{0}' contains non-ASCII letters (symbol '{1}' at index {2})", "iÊ", "Ê", 1),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -248,13 +249,13 @@ namespace CyrillicAnalyzer.Test
     {
         class TypeName
         {   
-            int i–∂ {get; set;}
+            int iÊ {get; set;}
         }
     }";
             var expected = new DiagnosticResult
             {
                 Id = "CyrillicAnalyzer",
-                Message = String.Format("Property name of '{0}' contains non-ASCII letters (symbol '{1}' at index {2})", "i–∂", "–∂", 1),
+                Message = String.Format("Property name of '{0}' contains non-ASCII letters (symbol '{1}' at index {2})", "iÊ", "Ê", 1),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -299,14 +300,14 @@ namespace CyrillicAnalyzer.Test
         {   
             void TestMethod()
             {
-                int i—ã = 0;
+                int i˚ = 0;
             }
         }
     }";
             var expected = new DiagnosticResult
             {
                 Id = "CyrillicAnalyzer",
-                Message = String.Format("Local name of '{0}' contains non-ASCII letters (symbol '{1}' at index {2})", "i—ã", "—ã", 1),
+                Message = String.Format("Local name of '{0}' contains non-ASCII letters (symbol '{1}' at index {2})", "i˚", "˚", 1),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -344,7 +345,7 @@ namespace CyrillicAnalyzer.Test
 
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {
-            return new CyrillicAnalyzerAnalyzer();
+            return new CyrillicAnalyzer.CyrillicAnalyzer();
         }
     }
 }
