@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
@@ -7,18 +7,18 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <PackageId>CuryllicAnalyzer</PackageId>
-    <PackageVersion>1.1.0.0</PackageVersion>
+    <PackageId>RoslynAsciiAnalyzer</PackageId>
+    <PackageVersion>1.1.1.0</PackageVersion>
     <Authors>Michael Korolev</Authors>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/RoboNET/RoslynCyrillicAnalyzer</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>
     <RepositoryUrl>https://github.com/RoboNET/RoslynCyrillicAnalyzer</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Description>CuryllicAnalyzer</Description>
-    <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
+    <Description>Analyzer show warning if your classes, properties, variables etc. contains non-ASCII symbols.</Description>
+    <PackageReleaseNotes>Migrate to .NET Standard.</PackageReleaseNotes>
     <Copyright>RoboNet</Copyright>
-    <PackageTags>CuryllicAnalyzer, analyzers</PackageTags>
+    <PackageTags>Cyrillic, ascii, analyzers, roslyn</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
    
