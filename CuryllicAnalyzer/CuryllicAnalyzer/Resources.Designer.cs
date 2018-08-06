@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CyrillicAnalyzer {
+namespace CuryllicAnalyzer {
     using System;
     using System.Reflection;
     
@@ -121,6 +121,24 @@ namespace CyrillicAnalyzer {
         internal static string Property {
             get {
                 return ResourceManager.GetString("Property", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Remove non-ASCII symbols.
+        /// </summary>
+        internal static string RemoveSymbols {
+            get {
+                return ResourceManager.GetString("RemoveSymbols", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Replace non-ASCII symbols to analog.
+        /// </summary>
+        internal static string ReplaceSymbols {
+            get {
+                return ResourceManager.GetString("ReplaceSymbols", resourceCulture);
             }
         }
         

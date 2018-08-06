@@ -1,9 +1,11 @@
-ï»¿using System.Collections.Immutable;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using CuryllicAnalyzer;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -16,9 +18,10 @@ namespace CyrillicAnalyzer
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(CyrillicAnalyzerCodeFixProvider)), Shared]
     public class CyrillicAnalyzerCodeFixProvider : CodeFixProvider
     {
-        private const string Title = "Make uppercase";
+        private LocalizableString RemoveSymbols = new LocalizableResourceString(nameof(Resources.RemoveSymbols), Resources.ResourceManager, typeof(Resources));
+        private LocalizableString ReplaceSymbols = new LocalizableResourceString(nameof(Resources.ReplaceSymbols), Resources.ResourceManager, typeof(Resources));
 
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(CyrillicAnalyzerAnalyzer.DiagnosticId);
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(CyrillicAnalyzer.DiagnosticId);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
@@ -61,30 +64,34 @@ namespace CyrillicAnalyzer
                 default:
                     return;
             }
+
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    title: Title,
-                    createChangedSolution: c => MakeUppercaseAsync(context.Document, memberDeclaration, identifierText, c),
-                    equivalenceKey: Title),
+                    title: RemoveSymbols.ToString(),
+                    createChangedSolution: c => RemoveSymbolsAsync(context.Document, memberDeclaration, identifierText, c),
+                    equivalenceKey: RemoveSymbols.ToString()),
+                diagnostic);
+
+            context.RegisterCodeFix(
+                CodeAction.Create(
+                    title: ReplaceSymbols.ToString(),
+                    createChangedSolution: c => ReplaceSymbolsAsync(context.Document, memberDeclaration, identifierText, c),
+                    equivalenceKey: ReplaceSymbols.ToString()),
                 diagnostic);
         }
 
-        private async Task<Solution> MakeUppercaseAsync(Document document, CSharpSyntaxNode typeDecl, string identifier, CancellationToken cancellationToken)
+        private async Task<Solution> RemoveSymbolsAsync(Document document, CSharpSyntaxNode typeDecl, string identifier, CancellationToken cancellationToken)
         {
-            // Compute new uppercase name.
             var newName = RemoveNonAsciiSymbols(identifier);
 
-            // Get the symbol representing the type to be renamed.
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var typeSymbol = semanticModel.GetDeclaredSymbol(typeDecl, cancellationToken);
 
-            // Produce a new solution that has all references to that type renamed, including the declaration.
             var originalSolution = document.Project.Solution;
             var optionSet = originalSolution.Workspace.Options;
             var newSolution = await Renamer.RenameSymbolAsync(document.Project.Solution, typeSymbol, newName, optionSet, cancellationToken).ConfigureAwait(false);
 
-            // Return the new solution with the now-uppercase type name.
             return newSolution;
         }
 
@@ -102,5 +109,68 @@ namespace CyrillicAnalyzer
             }
             return builder.ToString();
         }
+
+
+        private async Task<Solution> ReplaceSymbolsAsync(Document document, CSharpSyntaxNode typeDecl, string identifier, CancellationToken cancellationToken)
+        {
+            var newName = ReplaceNonAsciiSymbols(identifier);
+
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var typeSymbol = semanticModel.GetDeclaredSymbol(typeDecl, cancellationToken);
+
+            var originalSolution = document.Project.Solution;
+            var optionSet = originalSolution.Workspace.Options;
+            var newSolution = await Renamer.RenameSymbolAsync(document.Project.Solution, typeSymbol, newName, optionSet, cancellationToken).ConfigureAwait(false);
+
+            return newSolution;
+        }
+
+        private string ReplaceNonAsciiSymbols(string source)
+        {
+            var builder = new StringBuilder();
+            byte[] array = Encoding.Unicode.GetBytes(source);
+
+            for (int i = 0; i < array.Length; i += 2)
+            {
+                var c = (char)((array[i]) | (array[i + 1] << 8));
+
+                if (((array[i]) | (array[i + 1] << 8)) <= 128)
+                {
+                    builder.Append((char)(array[i] | (array[i + 1] << 8)));
+                }
+                else
+                {
+                    if (_charMap.ContainsKey(c))
+                    {
+                        builder.Append(_charMap[c]);
+                    }
+                }
+            }
+            return builder.ToString();
+        }
+
+        private Dictionary<char, char> _charMap = new Dictionary<char, char>()
+        {
+            {'ñ','c' },
+            {'Ñ','C' },
+            {'à','a' },
+            {'À','A' },
+            {'î','o' },
+            {'Î','O' },
+            {'Í','H' },
+            {'ð','p' },
+            {'Ð','P' },
+            {'Ì','M' },
+            {'ê','k' },
+            {'Ê','K' },
+            {'õ','x' },
+            {'Õ','X' },
+            {'Ò','T' },
+            {'ü','b' },
+            {'e','e' },
+            {'Å','E' },
+            {'Â','B' },
+            {'ã','r' }
+        };
     }
 }

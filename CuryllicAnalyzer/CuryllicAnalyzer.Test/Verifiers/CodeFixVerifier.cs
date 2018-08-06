@@ -1,20 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
-namespace CyrillicAnalyzer.Test.Verifiers
+namespace TestHelper
 {
     /// <summary>
     /// Superclass of all Unit tests made for diagnostics with codefixes.
     /// Contains methods used to verify correctness of codefixes
     /// </summary>
-    public abstract class CodeFixVerifier : DiagnosticVerifier
+    public abstract partial class CodeFixVerifier : DiagnosticVerifier
     {
         /// <summary>
         /// Returns the codefix being tested (C#) - to be implemented in non-abstract class
@@ -73,11 +73,11 @@ namespace CyrillicAnalyzer.Test.Verifiers
         /// <param name="allowNewCompilerDiagnostics">A bool controlling whether or not the test will fail if the CodeFix introduces other warnings after being applied</param>
         private void VerifyFix(string language, DiagnosticAnalyzer analyzer, CodeFixProvider codeFixProvider, string oldSource, string newSource, int? codeFixIndex, bool allowNewCompilerDiagnostics)
         {
-            var document = Helpers.DiagnosticVerifier.CreateDocument(oldSource, language);
-            var analyzerDiagnostics = Helpers.DiagnosticVerifier.GetSortedDiagnosticsFromDocuments(analyzer, new[] { document });
-            var compilerDiagnostics = Helpers.CodeFixVerifier.GetCompilerDiagnostics(document);
+            var document = CreateDocument(oldSource, language);
+            var analyzerDiagnostics = GetSortedDiagnosticsFromDocuments(analyzer, new[] { document });
+            var compilerDiagnostics = GetCompilerDiagnostics(document);
             var attempts = analyzerDiagnostics.Length;
-
+            
             for (int i = 0; i < attempts; ++i)
             {
                 var actions = new List<CodeAction>();
@@ -91,21 +91,21 @@ namespace CyrillicAnalyzer.Test.Verifiers
 
                 if (codeFixIndex != null)
                 {
-                    document = Helpers.CodeFixVerifier.ApplyFix(document, actions.ElementAt((int)codeFixIndex));
+                    document = ApplyFix(document, actions.ElementAt((int)codeFixIndex));
                     break;
                 }
 
-                document = Helpers.CodeFixVerifier.ApplyFix(document, actions.ElementAt(0));
-                analyzerDiagnostics = Helpers.DiagnosticVerifier.GetSortedDiagnosticsFromDocuments(analyzer, new[] { document });
+                document = ApplyFix(document, actions.ElementAt(0));
+                analyzerDiagnostics = GetSortedDiagnosticsFromDocuments(analyzer, new[] { document });
 
-                var newCompilerDiagnostics = Helpers.CodeFixVerifier.GetNewDiagnostics(compilerDiagnostics, Helpers.CodeFixVerifier.GetCompilerDiagnostics(document));
+                var newCompilerDiagnostics = GetNewDiagnostics(compilerDiagnostics, GetCompilerDiagnostics(document));
 
                 //check if applying the code fix introduced any new compiler diagnostics
                 if (!allowNewCompilerDiagnostics && newCompilerDiagnostics.Any())
                 {
                     // Format and get the compiler diagnostics again so that the locations make sense in the output
                     document = document.WithSyntaxRoot(Formatter.Format(document.GetSyntaxRootAsync().Result, Formatter.Annotation, document.Project.Solution.Workspace));
-                    newCompilerDiagnostics = Helpers.CodeFixVerifier.GetNewDiagnostics(compilerDiagnostics, Helpers.CodeFixVerifier.GetCompilerDiagnostics(document));
+                    newCompilerDiagnostics = GetNewDiagnostics(compilerDiagnostics, GetCompilerDiagnostics(document));
 
                     Assert.IsTrue(false,
                         string.Format("Fix introduced new compiler diagnostics:\r\n{0}\r\n\r\nNew document:\r\n{1}\r\n",
@@ -121,7 +121,7 @@ namespace CyrillicAnalyzer.Test.Verifiers
             }
 
             //after applying all of the code fixes, compare the resulting string to the inputted one
-            var actual = Helpers.CodeFixVerifier.GetStringFromDocument(document);
+            var actual = GetStringFromDocument(document);
             Assert.AreEqual(newSource, actual);
         }
     }
